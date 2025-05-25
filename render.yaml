@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: be-todo
+    env: docker                     # Use Docker
+    dockerfilePath: ./backend/Dockerfile  # Path to backend Dockerfile
+    envVars:                       # Environment variables
+      - key: DB_HOST
+        value: dpg-d0aeuqadbo4c73cdsojg-a  # From Render PostgreSQL dashboard
+      - key: DB_USER
+        value: todolistdb_xn1z_user     
+      - key: DB_PASSWORD
+        value: hMX0zqWrACiUxvdlu9old1CcnXVKxmCe    
+      - key: DB_NAME
+        value: todolistdb_xn1z         # Usually same as DB_USER
+      - key: PORT
+        value: 5000                 # Backend port
+
+  - type: web
+    name: fe-todo
+    env: docker
+    dockerfilePath: ./frontend/Dockerfile
+    envVars:
+      - key: REACT_APP_API_URL
+        value: https://be-todo-02230291.onrender.com # live backend URL

@@ -1,92 +1,60 @@
-/* Modern Google-inspired UI */
-.app {
+.App {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.todo-form {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  background: #f5f5f5;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
 }
 
-.todo-container {
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  padding: 2rem;
-  width: 90%;
-  max-width: 500px;
+.todo-form input, 
+.todo-form textarea {
+  padding: 8px;
+  font-size: 16px;
 }
 
-h1 {
-  color: #202124;
-  text-align: center;
-  margin-bottom: 1.5rem;
-}
-
-.input-group {
-  display: flex;
-  margin-bottom: 1.5rem;
-}
-
-input {
-  flex: 1;
-  padding: 0.8rem;
-  border: 1px solid #dadce0;
-  border-radius: 4px 0 0 4px;
-  font-size: 1rem;
-  outline: none;
-}
-
-input:focus {
-  border-color: #1a73e8;
-}
-
-button {
-  background: #1a73e8;
+.todo-form button {
+  padding: 8px;
+  background: #4CAF50;
   color: white;
   border: none;
-  padding: 0 1.2rem;
-  border-radius: 0 4px 4px 0;
   cursor: pointer;
-  font-weight: 500;
 }
 
-button:hover {
-  background: #1765cc;
-}
-
-.task-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.task-item {
+.todo-item {
+  border: 1px solid #ddd;
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 5px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.8rem;
-  border-bottom: 1px solid #e0e0e0;
-  transition: background 0.2s;
 }
 
-.task-item:hover {
-  background: #f8f9fa;
+.todo-item.completed {
+  background-color: #f5f5f5;
+  opacity: 0.7;
 }
 
-.task-item span {
-  flex: 1;
+.todo-item h3 {
+  margin: 0 0 5px 0;
 }
 
-.delete-btn {
-  background: transparent;
-  color: #5f6368;
-  border-radius: 50%;
-  padding: 0.5rem;
-  font-size: 1rem;
+.todo-item p {
+  margin: 0 0 10px 0;
+  color: #666;
 }
 
-.delete-btn:hover {
-  background: #f1f3f4;
-  color: #d93025;
+.todo-item small {
+  color: #999;
+}
+
+.todo-item button {
+  margin-left: 10px;
+  padding: 5px 10px;
+  cursor: pointer;
 }
