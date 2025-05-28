@@ -457,3 +457,135 @@ Credentials type mismatch in the Jenkins pipelin
 - Resolved multiple failures (**Node.js setup,Docker daemon, Docker auth, test reports**).
 - Final pipeline: **Builds → Tests → Deploys** seamlessly.
 
+# DSO101 Assignment III: Todo App CI/CD Deployment with GitHub Actions
+
+## Objective
+
+The goal of this assignment was to implement a fully automated CI/CD pipeline for a full-stack Todo list application using  using Docker, GitHub Actions, DockerHub, and Render.com. The setup involved containerizing the application with Docker, automating builds and deployment through GitHub Actions, storing container images on DockerHub, and deploying the application to the cloud using Render.com.
+
+## Project Structure
+
+The project consists of two components:
+
+- **frontend/**: React-based UI for the TODO application
+- **backend/**: Node.js (Express) API to manage tasks
+
+Each component is independently containerized and deployed using Docker and Render.
+
+```
+/
+├── backend/
+│   ├── package.json
+│   ├── Dockerfile
+│   └── ...
+├── frontend/
+│   ├── package.json
+│   ├── Dockerfile
+│   └── ...
+└── .github/
+    └── workflows/
+        └── deploy.yml
+```
+
+## Implementation Steps
+
+### 1. Repository Setup
+
+- Verified that both the **frontend** and **backend** directories included valid `package.json` files with the required `start` and `test` scripts
+- Confirmed that the repository was **public** for workflow accessibility
+- Ensured proper Dockerfiles were present in both components, following the Node.js container best practices
+
+### 2. Dockerfiles Configuration
+
+Created Dockerfiles using the official Node.js Alpine image to keep the containers lightweight. Each file installs dependencies, runs optional tests, and starts the app.
+
+**Common Dockerfile Template:**
+
+```dockerfile
+FROM node:20-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm test
+EXPOSE 5000
+CMD ["npm", "start"]
+```
+
+### 3. GitHub Actions Workflow
+
+Configured a workflow file at `.github/workflows/deploy.yml` to automate:
+
+- Code checkout
+- DockerHub login using secrets
+- Building and pushing Docker images for both frontend and backend
+- Triggering Render deployments via deploy webhooks
+
+![alt text](assets/A3/A3.1.png)
+
+### 4. GitHub Secrets Management
+
+- Get the Docker credientials from the DockerHub
+![alt text](assets/A3/A3.3.png)
+
+Under **Settings → Secrets and variables → Actions**, the following secrets were securely added:
+
+- `DOCKERHUB_USERNAME`: DockerHub username
+- `DOCKERHUB_TOKEN`: Personal access token with read/write permissions
+- `RENDER_BACKEND_WEBHOOK_URL`: Backend deploy webhook from Render
+- `RENDER_FRONTEND_WEBHOOK_URL`: Frontend deploy webhook from Render
+
+![alt text](assets/A3/A3.5.png)
+![alt text](assets/A3/A3.7.png)
+
+### 5. Render Deployment Configuration
+
+- Deployed both services on Render.com using the "Deploy an existing Docker image" option
+- Obtained deploy webhook URLs and connected them to GitHub Actions via secrets (same like in step 4)
+
+
+### 6. Pipeline Execution
+
+- Pushed changes to the main branch, which automatically triggered the CI/CD pipeline
+- Workflow successfully completed all stages:
+  - Docker images were built and pushed
+  - Webhooks triggered the deployment
+  - Applications became available live on the web
+
+![alt text](assets/A3/A3.8.png)
+
+### 7. Testing & Validation
+
+- Verified Docker image presence in DockerHub for both services
+- Verified that it deployed via Deploy Hook
+
+![alt text](assets/A3/A3.4.png)
+![alt text](assets/A3/A3.11.png)
+
+![alt text](assets/A3/A3.9.png)
+
+
+## Challenges Faced
+
+### Secrets Misplacement
+
+Initially added secrets under "Codespaces" instead of "Actions", which caused authentication errors. Moving them to the correct location fixed the issue.
+
+### DockerHub Token Scope
+
+The token had insufficient permissions initially as there were Credientials mismatch. Regenerating it with the correct scopes and have the consistence naming that resolved push failures.
+
+![alt text](assets/A3/A3.10.png)
+
+## Key Learnings
+
+- Used GitHub Actions to automate CI/CD with YAML workflows.
+- Deployed both React frontend and Node.js backend using Docker.
+- Automated deployments on Render.com using webhooks.
+- Securely managed credentials with GitHub Secrets.
+- Set up a full DevOps pipeline from code commit to live deployment.
+
+## Conclusion
+*This assignment provided a practical and holistic experience of implementing CI/CD pipelines in a real-world context. By leveraging Docker, GitHub Actions, DockerHub, and Render.com, the deployment workflow has been fully automated.
+
+With each new push to the main branch, the application now builds, publishes, and deploys automatically demonstrating production ready DevOps lifecycle.*
