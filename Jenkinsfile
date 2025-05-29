@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        DOCKER_CREDS = credentials('docker-credentials')  // secure reference
+        DOCKER_CREDS = credentials('docker-credentials')  // matches your Jenkins credential ID
     }
     stages {
         stage('Checkout Code') {
@@ -23,7 +23,7 @@ pipeline {
             steps {
                 script {
                     sh '''
-                    echo $DOCKER_CREDS_PSW | docker login -u $DOCKER-CREDENTIALS --password-stdin
+                    echo $DOCKER_CREDS_PSW | docker login -u $DOCKER_CREDS_USR --password-stdin
                     docker push namgyelhuk708/secure-backend
                     '''
                 }
