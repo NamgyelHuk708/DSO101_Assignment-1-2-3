@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        DOCKER_CREDS = credentials('docker-hub-creds')  // secure reference
+        DOCKER_CREDS = credentials('docker-credentials')  // secure reference
     }
     stages {
         stage('Checkout Code') {
@@ -23,7 +23,7 @@ pipeline {
             steps {
                 script {
                     sh '''
-                    echo $DOCKER_CREDS_PSW | docker login -u $DOCKEr-CREDENTIALS --password-stdin
+                    echo $DOCKER_CREDS_PSW | docker login -u $DOCKER-CREDENTIALS --password-stdin
                     docker push namgyelhuk708/secure-backend
                     '''
                 }
