@@ -634,7 +634,7 @@ To avoid hardcoding sensitive credentials, DockerHub tokens and usernames were s
 
 ![alt text](assets/A4/A4.3.png)
 
-### 3. GitHub Actions: deploy.yml – Secure Multi-Step Deployment
+### 3. GitHub Actions: deploy.yml Secure Multi-Step Deployment
 
 The `deploy.yml` workflow was rewritten to streamline and secure the deployment of both services, using GitHub Actions best practices.
 
@@ -650,10 +650,12 @@ The `deploy.yml` workflow was rewritten to streamline and secure the deployment 
 - Avoided direct docker build commands to reduce secret leakage risk
 - Used curl to trigger deployments on Render.com via secure webhooks
 
-*[Insert screenshot: GitHub Actions deploy logs]*  
-*[Insert screenshot: DockerHub showing secure pushed images]*
+![alt text](assets/A4/A4.10.png)
 
-### 4. GitHub Actions: docker-publish.yml – Secure Parallel Builds
+![alt text](assets/A4/A4.6.png)
+
+
+### 4. GitHub Actions: docker publish.yml  Secure Parallel Builds
 
 To enhance modularity and fault isolation, the `docker-publish.yml` workflow was updated to run parallel jobs for frontend and backend builds.
 
@@ -673,8 +675,10 @@ To enhance modularity and fault isolation, the `docker-publish.yml` workflow was
 - Simplified troubleshooting
 - Safer and cleaner logs
 
-*[Insert screenshot: GitHub Actions job matrix]*  
-*[Insert screenshot: DockerHub with distinct frontend/backend image tags]*
+![alt text](assets/A4/A4.11.png)
+
+![alt text](assets/A4/A4.6.png)
+
 
 ### 5. Jenkins Pipeline: Secure Docker Build and Push
 
@@ -683,7 +687,7 @@ A secure Jenkins pipeline was configured to automate Docker builds and image upl
 **Credential Handling:**
 
 - DockerHub credentials were stored in Jenkins as `docker-hub-creds`
-- The pipeline securely injected credentials using `credentials('docker-hub-creds')`
+- The pipeline securely injected credentials using `credentials('docker-credentials')`
 
 **Pipeline Stages:**
 
@@ -691,7 +695,7 @@ A secure Jenkins pipeline was configured to automate Docker builds and image upl
 - **Build**: Created the Docker image
 - **Login & Push**: Logged into DockerHub using:
   ```bash
-  echo $DOCKER_CREDS_PSW | docker login -u $DOCKER_CREDS_USR --password-stdin
+  echo $DOCKER_CREDS_PSW | docker login -u $DOCKER_CREDENTIAlas --password-stind
   ```
   - Ensured password wasn't echoed or exposed
 
@@ -734,4 +738,4 @@ The final pipeline is:
 - Integrated with external deployment services like Render.com
 - Modular, maintainable, and ready for production environments
 
-By applying modern DevSecOps principles, we ensured that our pipeline is not only functional but resilient and security-first by design.
+By applying modern DevSecOps principles, we ensured that the pipeline is not only functional but resilient and security-first by design.
