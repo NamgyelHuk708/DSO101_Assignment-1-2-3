@@ -589,3 +589,149 @@ The token had insufficient permissions initially as there were Credientials mism
 *This assignment provided a practical and holistic experience of implementing CI/CD pipelines in a real-world context. By leveraging Docker, GitHub Actions, DockerHub, and Render.com, the deployment workflow has been fully automated.
 
 With each new push to the main branch, the application now builds, publishes, and deploys automatically demonstrating production ready DevOps lifecycle.*
+
+# Assignment IV:Secure CI/CD Pipeline with Docker, GitHub Actions & Jenkins
+
+## Objective
+
+The goal of this assignment was to implement a secure Continuous Integration and Continuous Deployment (CI/CD) pipeline using:
+
+- Docker
+- GitHub Actions
+- Jenkins
+
+Security best practices were applied to:
+
+- Avoid exposing secrets (e.g., DockerHub credentials)
+- Prevent containers from running as root
+- Secure image build and deployment processes
+- Control release workflows to run only from trusted branches (e.g., main)
+
+## Implementation Steps
+
+### 1. Dockerfile Security: Running Containers as Non-Root
+
+To reduce the attack surface of our containers, both the frontend and backend Dockerfiles were updated to run under non-root users.
+
+- Users created:
+  - `node` for backend
+  - `nginx` for frontend
+- Ownership and permissions were adjusted so these users had proper access to application files
+- Used the `USER` directive in each Dockerfile to drop privileges from root to the created users
+
+![alt text](assets/A4/A4.1.png)
+![alt text](assets/A4/A4.2.png)
+
+### 2. Securing DockerHub Credentials with GitHub Secrets
+
+To avoid hardcoding sensitive credentials, DockerHub tokens and usernames were stored securely using GitHub Secrets.
+
+- Secrets added under: **GitHub → Settings → Secrets and variables → Actions:**
+  - `DOCKERHUB_USERNAME`
+  - `DOCKERHUB_TOKEN`
+- Secure login was handled using `docker/login-action@v3`, which masked all credential-related steps from logs
+- Secrets were referenced in workflows via `${{ secrets.DOCKERHUB_USERNAME }}` and `${{ secrets.DOCKERHUB_TOKEN }}`
+
+![alt text](assets/A4/A4.3.png)
+
+### 3. GitHub Actions: deploy.yml – Secure Multi-Step Deployment
+
+The `deploy.yml` workflow was rewritten to streamline and secure the deployment of both services, using GitHub Actions best practices.
+
+**Build & Push Strategy:**
+
+- Built both frontend and backend Docker images
+- Used `docker/build-push-action@v6` for a secure, encapsulated image build process
+- Restricted execution to the main branch using `on: push: branches: ['main']`
+
+**Security Enhancements:**
+
+- Secrets were used for DockerHub login and Render webhook URLs
+- Avoided direct docker build commands to reduce secret leakage risk
+- Used curl to trigger deployments on Render.com via secure webhooks
+
+*[Insert screenshot: GitHub Actions deploy logs]*  
+*[Insert screenshot: DockerHub showing secure pushed images]*
+
+### 4. GitHub Actions: docker-publish.yml – Secure Parallel Builds
+
+To enhance modularity and fault isolation, the `docker-publish.yml` workflow was updated to run parallel jobs for frontend and backend builds.
+
+**Workflow Design:**
+
+- Defined two independent jobs:
+  - `build-and-push-image1`: Builds & pushes frontend
+  - `build-and-push-image2`: Builds & pushes backend
+- Each job:
+  - Checked out the source code
+  - Logged into DockerHub securely using `docker/login-action@v3`
+  - Used `docker/build-push-action@v6` for a secure build pipeline
+
+**Benefits:**
+
+- Clear separation of concerns
+- Simplified troubleshooting
+- Safer and cleaner logs
+
+*[Insert screenshot: GitHub Actions job matrix]*  
+*[Insert screenshot: DockerHub with distinct frontend/backend image tags]*
+
+### 5. Jenkins Pipeline: Secure Docker Build and Push
+
+A secure Jenkins pipeline was configured to automate Docker builds and image uploads to DockerHub without exposing sensitive data.
+
+**Credential Handling:**
+
+- DockerHub credentials were stored in Jenkins as `docker-hub-creds`
+- The pipeline securely injected credentials using `credentials('docker-hub-creds')`
+
+**Pipeline Stages:**
+
+- **Checkout**: Pulled code from the Git repository
+- **Build**: Created the Docker image
+- **Login & Push**: Logged into DockerHub using:
+  ```bash
+  echo $DOCKER_CREDS_PSW | docker login -u $DOCKER_CREDS_USR --password-stdin
+  ```
+  - Ensured password wasn't echoed or exposed
+
+Updated the credentials
+![alt text](assets/A4/A4.5..png)
+
+Jenkins Build successful
+![alt text](assets/A4/A4.7.png)
+
+DockerHub showing secure pushed image
+![alt text](assets/A4/A4.6.png)
+
+## Challenges Faced
+
+- Non-root user changes initially caused permission issues during container builds
+- Debugging secret usage to ensure no leaks in GitHub Actions or Jenkins logs
+- Jenkins' `credentials()` syntax required careful testing to get credential binding correct
+- Webhook URL references from GitHub Secrets needed precise formatting to trigger Render correctly
+
+## Key Learnings
+
+- **Container Hardening**: Avoiding root user execution in Docker significantly enhances runtime security
+- **Secret Hygiene**: GitHub Secrets and Jenkins Credentials are essential for safe, audit-proof automation
+- **Controlled Deployment**: Using main-only triggers prevents unintended production deployments
+- **Reusable Actions**: GitHub's login and build-push actions are more secure and easier to maintain than raw shell commands
+- **Pipeline Modularity**: Splitting workflows (e.g., parallel image builds) improves readability and CI/CD maintenance
+
+## Conclusion
+
+This assignment successfully demonstrated how to build a secure, maintainable, and automated CI/CD pipeline by integrating:
+
+- **Docker**: with non-root users and secure builds
+- **GitHub Actions**: for automated, secret-aware CI/CD workflows
+- **Jenkins**: for credential-injected, stage-driven Docker automation
+
+The final pipeline is:
+
+- Secure against common vulnerabilities like root execution and credential exposure
+- Limited to trusted branch triggers
+- Integrated with external deployment services like Render.com
+- Modular, maintainable, and ready for production environments
+
+By applying modern DevSecOps principles, we ensured that our pipeline is not only functional but resilient and security-first by design.

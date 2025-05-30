@@ -1,56 +1,53 @@
-name: Build and Push Docker Images
-
+name: Secure CI/CD Pipeline for TODO App
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    branches: ["main"]
 
 jobs:
-  build-and-push-image1:
+  build-and-push-image1:  # Frontend job
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
+      - name: Checkout Repository
         uses: actions/checkout@v4
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-
-      - name: Login to Docker Hub
+      - name: Login to DockerHub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Build and push Image 1
+      - name: Build and Push Frontend Image
         uses: docker/build-push-action@v6
         with:
           context: ./frontend
           file: ./frontend/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/image1:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/todo-frontend:secure
+      - name: Trigger Render Deployment (Frontend)
+        if: success()
+        run: |
+          curl -X POST ${{ secrets.RENDER_FRONTEND_WEBHOOK_URL || 'https://example.com/webhook' }}
 
-  build-and-push-image2:
+  build-and-push-image2:  # Backend job
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
+      - name: Checkout Repository
         uses: actions/checkout@v4
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-
-      - name: Login to Docker Hub
+      - name: Login to DockerHub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Build and push Image 2
+      - name: Build and Push Backend Image
         uses: docker/build-push-action@v6
         with:
           context: ./backend
           file: ./backend/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/image2:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/todo-backend:secure
+      - name: Trigger Render Deployment (Backend)
+        if: success()
+        run: |
+          curl -X POST ${{ secrets.RENDER_BACKEND_WEBHOOK_URL || 'https://example.com/webhook' }}
